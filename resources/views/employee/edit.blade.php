@@ -9,12 +9,13 @@
 </head>
 
 <body>
-    <form action="{{ route('employees.store') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('employees.update', $employees->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
+        @method('PUT')
 
         <!-- First Name -->
         <label for="first_name">First Name</label>
-        <input type="text" name="first_name" id="first_name" value="{{ old('first_name') }}">
+        <input type="text" name="first_name" id="first_name" value="{{ $employees->first_name }}">
         @error('first_name')
             <div style="color: red;">{{ $message }}</div>
         @enderror
@@ -22,7 +23,7 @@
 
         <!-- Last Name -->
         <label for="last_name">Last Name</label>
-        <input type="text" name="last_name" id="last_name" value="{{ old('last_name') }}">
+        <input type="text" name="last_name" id="last_name" value="{{ $employees->last_name }}">
         @error('last_name')
             <div style="color: red;">{{ $message }}</div>
         @enderror
@@ -30,7 +31,7 @@
 
         <!-- Email -->
         <label for="email">Email</label>
-        <input type="email" name="email" id="email" value="{{ old('email') }}">
+        <input type="email" name="email" id="email" value="{{ $employees->email }}">
         @error('email')
             <div style="color: red;">{{ $message }}</div>
         @enderror
@@ -51,7 +52,8 @@
 
         <!-- Mobile Number -->
         <label for="mobile_number">Mobile Number</label>
-        <input type="number" name="mobile_number" id="mobile_number" value="{{ old('mobile_number') }}" placeholder="Enter your mobile number">
+        <input type="number" name="mobile_number" id="mobile_number" value="{{ $employees->mobile_number }}"
+            placeholder="Enter your mobile number">
         @error('mobile_number')
             <div style="color: red;">{{ $message }}</div>
         @enderror
@@ -59,7 +61,7 @@
 
         <!-- Address -->
         <label for="address">Address</label>
-        <input type="text" name="address" id="address" value="{{ old('address') }}">
+        <input type="text" name="address" id="address" value="{{ $employees->address }}">
         @error('address')
             <div style="color: red;">{{ $message }}</div>
         @enderror
@@ -67,39 +69,41 @@
 
         <!-- Gender -->
         <label for="gender">Gender:</label><br>
-        <input type="radio" name="gender" id="male" value="1" {{ old('gender') == '0' ? 'checked' : '' }}>
+        <input type="radio" name="gender" id="male" value="0"
+            {{ $employees->gender->value == '1' ? 'checked' : '' }}>
         <label for="male">Male</label><br>
 
-        <input type="radio" name="gender" id="female" value="2" {{ old('gender') == '1' ? 'checked' : '' }}>
+        <input type="radio" name="gender" id="female" value="1"
+            {{ $employees->gender->value == '2' ? 'checked' : '' }}>
         <label for="female">Female</label><br>
 
-        <input type="radio" name="gender" id="other" value="3" {{ old('gender') == '2' ? 'checked' : '' }}>
+        <input type="radio" name="gender" id="other" value="2"
+            {{ $employees->gender->value == '3' ? 'checked' : '' }}>
         <label for="other">Other</label>
         @error('gender')
             <div style="color: red;">{{ $message }}</div>
         @enderror
         <br><br>
-
         <!-- Hobbies -->
-        <label for="hobbies">Hobbies:</label><br>
-        <input type="checkbox" name="hobbies[]" id="reading" value="1" {{ in_array(1, old('hobbies', [])) ? 'checked' : '' }}>
+        <input type="checkbox" name="hobbies[]" value="1"
+            {{ in_array(1, array_map('intval', json_decode($employees->hobbies, true) ?? [])) ? 'checked' : '' }}>
         <label for="reading">Reading</label><br>
 
-        <input type="checkbox" name="hobbies[]" id="traveling" value="2" {{ in_array(2, old('hobbies', [])) ? 'checked' : '' }}>
+        <input type="checkbox" name="hobbies[]" value="2"
+            {{ in_array(2, array_map('intval', json_decode($employees->hobbies, true) ?? [])) ? 'checked' : '' }}>
         <label for="traveling">Traveling</label><br>
 
-        <input type="checkbox" name="hobbies[]" id="sports" value="3" {{ in_array(3, old('hobbies', [])) ? 'checked' : '' }}>
+        <input type="checkbox" name="hobbies[]" value="3"
+            {{ in_array(3, array_map('intval', json_decode($employees->hobbies, true) ?? [])) ? 'checked' : '' }}>
         <label for="sports">Sports</label><br>
 
-        <input type="checkbox" name="hobbies[]" id="music" value="4" {{ in_array(4, old('hobbies', [])) ? 'checked' : '' }}>
+        <input type="checkbox" name="hobbies[]" value="4"
+            {{ in_array(4, array_map('intval', json_decode($employees->hobbies, true) ?? [])) ? 'checked' : '' }}>
         <label for="music">Music</label><br>
 
-        <input type="checkbox" name="hobbies[]" id="coding" value="5" {{ in_array(5, old('hobbies', [])) ? 'checked' : '' }}>
-        <label for="coding">Coding</label><br><br>
-        @error('hobbies')
-            <div style="color: red;">{{ $message }}</div>
-        @enderror
-
+        <input type="checkbox" name="hobbies[]" value="5"
+            {{ in_array(5, array_map('intval', json_decode($employees->hobbies, true) ?? [])) ? 'checked' : '' }}>
+        <label for="coding">Coding</label><br>
         <!-- Upload Photo -->
         <label for="photo">Upload Photo:</label>
         <input type="file" name="photo" id="photo" accept="image/*">
@@ -108,7 +112,7 @@
         @enderror
         <br><br>
 
-        <button type="submit">Submit</button>
+        <button type="submit">Update</button>
     </form>
 
 </body>

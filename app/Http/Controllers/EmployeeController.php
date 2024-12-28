@@ -3,80 +3,113 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\EmployeeRequest;
+use App\Http\Requests\EmployeeUpdateRequest;
 use App\Models\Employee;
-use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
 {
+
     /**
-     * Display a listing of the resource.
+     * Method index
+     *
+     * @return void
      */
     public function index()
     {
-        //
-
+        $employees = Employee::all()->map(function ($employee) {
+            $employee->hobbies = json_decode($employee->hobbies, true);
+            return $employee;
+        });
+        return view('employee.index', compact('employees'));
     }
 
+
     /**
-     * Show the form for creating a new resource.
+     * Method create
+     *
+     * @return void
      */
     public function create()
     {
         return view('employee.create');
     }
 
+
     /**
-     * Store a newly created resource in storage.
+     * Method store
+     *
+     * @param EmployeeRequest $request [explicite description]
+     *
+     * @return void
      */
     public function store(EmployeeRequest $request)
     {
         try {
-
             if ($request->hasFile('photo')) {
-                $photoPath = $request->file('photo')->store('photos', 'public');
-                $photoName = basename($photoPath);
+                $filestore = 'photo' . time() . '.' . $request->photo->getClientOriginalExtension();
+                $request->photo->storeAs('public/photos', $filestore);
             }
             $data = $request->all();
-            $data['hobbies'] = implode(',', $data['hobbies']);
-            $data['photo'] = $photoName ?? null;
-            dd($data);
+            $data['hobbies'] = json_encode($data['hobbies']);
+            $data['photo'] = $filestore;
             Employee::create($data);
-           echo "Employee created successfully!";
+            return redirect()->route('employees.index');
         } catch (\Exception $e) {
             echo "Error creating employee: " . $e->getMessage();
         }
-
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
+     * Method edit
+     *
+     * @param string $id [explicite description]
+     *
+     * @return void
      */
     public function edit(string $id)
     {
-        //
+        $employees = Employee::find($id);
+        return view('employee.edit', compact('employees'));
     }
 
+
     /**
-     * Update the specified resource in storage.
+     * Method update
+     *
+     * @param EmployeeUpdateRequest $request [explicite description]
+     * @param string $id [explicite description]
+     *
+     * @return void
      */
-    public function update(Request $request, string $id)
+    public function update( EmployeeUpdateRequest $request, string $id)
     {
-        //
+        try {
+            $employee = Employee::find($id);
+            $data = $request->all();
+            $data['hobbies'] = json_encode($data['hobbies']);
+            if ($request->hasFile('photo')) {
+                $filestore = 'photo' . time() . '.' . $request->photo->getClientOriginalExtension();
+                $request->photo->storeAs('public/photos', $filestore);
+                $data['photo'] = $filestore;
+            }
+            $employee->update($data);
+            return redirect()->route('employees.index');
+        } catch (\Exception $e) {
+            echo "Error updating employee: " . $e->getMessage();
+        }
     }
 
+
     /**
-     * Remove the specified resource from storage.
+     * Method destroy
+     *
+     * @param string $id [explicite description]
+     *
+     * @return void
      */
     public function destroy(string $id)
     {
-        //
+        Employee::find($id)->delete();
+        return redirect()->route('employees.index');
     }
 }
